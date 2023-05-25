@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplicación de Ventas</title>
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  <!-- Agrega los enlaces a los estilos de Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+  
+    <!-- <h1>Aplicación de Ventas</h1>--> 
+
+    <!--<h2>Pantalla de ACM de productos</h2>--> 
+
+    <header class="cabecera"><h1>Birrieria El Cholo</h1></header>
+
+    <nav class="barra-navegacion">
+      <ul class="lista">
+        <li><a href="../EjemploDesglosado/ACMScreen.html"><h4>Pantalla ACM de productos</h4></a></li>
+        <li><a href="../EjemploDesglosado/FormularioCobro.html"><h4>Formulario de cobro</h4></a></li>
+        <li><a href="../EjemploDesglosado/ChecarVentas.html"><h4>Lista de venta por dia</h4></a></li>
+      </ul>
+    </nav>
+  
+    <div class="formularios">
+      <div class = "formulario-elegante">
+        <form id="productForm">
+          <div class="form-group">
+            <label for="description">Descripción del producto:</label>
+            <input type="text" class="form-control" id="description" required>
+          </div>
+          <div class="form-group">
+            <label for="price">Precio unitario:</label>
+            <input type="number" class="form-control" id="price" step="0.01" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Agregar Producto</button>
+        </form>
+    
+        <h2>Formulario de cobro</h2>
+        <div id="productButtons"></div>
+        <div class="form-group">
+          <label for="productSelect">Seleccione un producto:</label>
+          <select class="form-control" id="productSelect"></select>
+        </div>
+        <div class="form-group">
+          <label for="quantity">Cantidad:</label>
+          <input type="number" class="form-control" id="quantity" min="1" required>
+        </div>
+        <button id="addProductBtn" class="btn btn-primary">Agregar Producto</button>
+    
+        <h3>Lista de productos seleccionados:</h3>
+        <ul id="productList"></ul>
+        <div id="totalAmount"></div>
+    
+        <button id="payBtn" class="btn btn-success">Pagar y Registrar Ventas</button>
+    
+        <h2>Lista de ventas por día</h2>
+        <form id="salesForm">
+          <div class="form-group">
+            <label for="date">Fecha:</label>
+            <input type="date" class="form-control" id="date" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Consultar Ventas</button>
+        </form>
+        <div id="totalSales"></div>
+      </div>
+    </div>
+  
+
+  <!-- Agrega los enlaces a los scripts de jQuery y Bootstrap -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+  <script>
+    // Lógica JavaScript para interactuar con la aplicación
+
+    // Array para almacenar los productos
+    let products = [];
+
+    // Función para agregar un producto al array
+    function addProduct(description, price) {
+      const product = {
+        description,
+        price
+      };
+      products.push(product);
+    }
+
+    // Función para actualizar la lista de productos disponibles en el formulario de cobro
+    function updateProductList() {
+      const productSelect = document.getElementById('productSelect');
+      productSelect.innerHTML = '';
+
+      for (let i = 0; i < products.length; i++) {
+        const option = document.createElement('option');
+        option.text = products[i].description;
+        option.value = i;
+        productSelect.appendChild(option);
+      }
+    }
+
+    // Función para calcular el precio total del producto seleccionado y actualizar la lista de productos seleccionados
+    function calculateTotal() {
+      const productIndex = document.getElementById('productSelect').value;
+      const quantity = parseInt(document.getElementById('quantity').value);
+
+      const product = products[productIndex];
+      const totalPrice = product.price * quantity;
+
+      const productList = document.getElementById('productList');
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `${product.description} - ${quantity} unidad(es) - Total: $${totalPrice.toFixed(2)}`;
+      productList.appendChild(listItem);
+
+      const totalAmount = document.getElementById('totalAmount');
+      const currentTotal = parseFloat(totalAmount.innerHTML) || 0;
+      totalAmount.innerHTML = (currentTotal + totalPrice).toFixed(2);
+    }
+
+    // Función para mostrar el total de ventas del día consultado
+    function showTotalSales(total) {
+      const totalSales = document.getElementById('totalSales');
+      totalSales.innerHTML = `Total de ventas: $${total.toFixed(2)}`;
+    }
+
+    // Evento para capturar el formulario de agregar producto
+    const productForm = document.getElementById('productForm');
+    productForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const description = document.getElementById('description').value;
+      const price = parseFloat(document.getElementById('price').value);
+
+      addProduct(description, price);
+      updateProductList();
+
+      // Limpiar los campos del formulario
+      document.getElementById('description').value = '';
+      document.getElementById('price').value = '';
+    });
+
+    // Evento para agregar un producto seleccionado al formulario de cobro
+    const addProductBtn = document.getElementById('addProductBtn');
+    addProductBtn.addEventListener('click', function() {
+      calculateTotal();
+
+      // Limpiar los campos del formulario de cobro
+      document.getElementById('productSelect').value = '';
+      document.getElementById('quantity').value = '';
+    });
+
+    // Evento para pagar y registrar las ventas
+    const payBtn = document.getElementById('payBtn');
+    payBtn.addEventListener('click', function() {
+      // Registrar las ventas en la base de datos o sistema de backend
+
+      // Limpiar la lista de productos seleccionados y el total
+      document.getElementById('productList').innerHTML = '';
+      document.getElementById('totalAmount').innerHTML = '';
+    });
+
+    // Evento para capturar el formulario de consultar ventas
+    const salesForm = document.getElementById('salesForm');
+    salesForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const selectedDate = document.getElementById('date').value;
+
+      // Realizar la consulta en la base de datos o sistema de backend para obtener el total de ventas del día
+
+      // Mostrar el total de ventas en la interfaz
+      showTotalSales(150.00); // Reemplaza el valor 150.00 con el total obtenido de la consulta
+    });
+  </script>
+</body>
+</html>
